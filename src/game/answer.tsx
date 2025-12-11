@@ -4,7 +4,6 @@ import { data } from "../airports/cleanData";
 import Select from "react-select";
 import "./answer.css";
 import { useEffect, useState } from "react";
-import { time } from "console";
 import { addGameResult } from "../leaderboard/leaderboardSlice";
 
 const municipalityList = Array.from(
@@ -96,7 +95,7 @@ const AnswerClock = ({ lastAnswerTime }: { lastAnswerTime: number }) => {
       if (lastAnswerTime) {
         const now = new Date();
         const elapsedTime = Math.floor((now.getTime() - lastAnswerTime) / 1000);
-        const timeLeft = 5 - elapsedTime;
+        const timeLeft = 60 - elapsedTime;
         if (timeLeft <= 0) {
           dispatch(addGameResult(gameState));
           dispatch(endGame());

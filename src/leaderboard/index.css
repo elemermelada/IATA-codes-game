@@ -1,0 +1,25 @@
+.leaderboard-title {
+  text-align: center;
+}
+
+.leaderboard-container {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.leaderboard-table {
+  border-collapse: collapse;
+  margin: 0 auto;
+  background: transparent;
+}
+
+.leaderboard-th {
+  text-align: center;
+  padding: 4px 10px;
+}
+
+.leaderboard-td {
+  padding: 4px 10px;
+  text-align: center;
+}
