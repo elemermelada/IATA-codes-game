@@ -1,21 +1,29 @@
-import React from 'react';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Game } from "./game";
+import { useAppDispatch, useAppSelector } from "./redux/hooks";
+import { addAnswer } from "./game/gameSlice";
 
 function App() {
+  const playing = useAppSelector((state) => state.game.playing);
+  const dispatch = useAppDispatch();
+
+  const submitAnswer = () => {
+    dispatch(addAnswer({ iataCode: "", cityName: "", isCorrect: false }));
+  };
+
+  const handleEnterPressed = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      playing ? submitAnswer() : submitAnswer();
+    }
+  };
+
   return (
-    <div className="App">
+    <div className="App" onKeyDown={handleEnterPressed}>
       <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Game />
       </header>
     </div>
   );
