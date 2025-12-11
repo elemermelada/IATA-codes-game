@@ -15,20 +15,12 @@ export const Game = () => {
       <input
         value={gameState.playerName}
         onChange={(e) => updatePlayerName(e.target.value)}
+        autoFocus
       />
       {gameState.playing ? (
         <AnswerContainer />
       ) : (
-        <button
-          onClick={() => {
-            // Start the game by adding an empty answer
-            dispatch(
-              addAnswer({ iataCode: "", cityName: "", isCorrect: false })
-            );
-          }}
-        >
-          Start Game
-        </button>
+        <div>Press Enter to start a new game!</div>
       )}
     </div>
   );

@@ -6,7 +6,7 @@ import { RootState } from "../redux/store";
 
 export interface Answer {
   iataCode: string;
-  cityName: string;
+  municipality: string;
   isCorrect: boolean;
 }
 
@@ -33,14 +33,9 @@ export const gameSlice = createSlice({
       state.answers.push(action.payload);
       state.playing = true;
     },
-    editAnswer: (
-      state,
-      action: PayloadAction<{ index: number; answer: Answer }>
-    ) => {
-      const { index, answer } = action.payload;
-      if (index >= 0 && index < state.answers.length) {
-        state.answers[index] = answer;
-      }
+    editCurrentAnswer: (state, action: PayloadAction<Answer>) => {
+      const answer = action.payload;
+      state.answers[state.answers.length - 1] = answer;
     },
     resetGame: (state) => {
       state.answers = [];
@@ -49,7 +44,7 @@ export const gameSlice = createSlice({
   },
 });
 
-export const { changePlayerName, addAnswer, editAnswer, resetGame } =
+export const { changePlayerName, addAnswer, editCurrentAnswer, resetGame } =
   gameSlice.actions;
 
 export const selectAnswers = (state: RootState) => state.game.answers;
