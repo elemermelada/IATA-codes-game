@@ -2,9 +2,36 @@ import React, { useCallback } from "react";
 import "./App.css";
 import { Game } from "./game";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { startGame, addAnswer, editCurrentAnswer } from "./game/gameSlice";
+import {
+  startGame,
+  addAnswer,
+  editCurrentAnswer,
+  Answer,
+} from "./game/gameSlice";
 import { data } from "./airports/cleanData";
 import { Leaderboard } from "./leaderboard";
+
+const answerIsValid = (answer: Answer) => {
+  if (!answer) return false;
+  if (answer.iataCode.length !== 3) return false;
+  const correctAirport = data.find(
+    (airport) => airport.iata_code === answer.iataCode
+  );
+  if (!correctAirport) return false;
+  if (answer.municipality.trim() === "") return false;
+  return true;
+};
+
+const answerIsCorrect = (answer: Answer) => {
+  const correctAirport = data.find(
+    (airport) => airport.iata_code === answer.iataCode
+  ); // TODO - Should transform into a map of iata_code to airport for performance
+  if (!correctAirport) return false;
+  return (
+    correctAirport.municipality.toLowerCase() ===
+    answer.municipality.toLowerCase()
+  );
+};
 
 function App() {
   const playing = useAppSelector((state) => state.game.playing);
@@ -13,15 +40,9 @@ function App() {
   const dispatch = useAppDispatch();
 
   const submitAnswer = () => {
-    if (!currentAnswer) return;
-    if (currentAnswer.iataCode.length !== 3) return;
-    const correctAirport = data.find(
-      (airport) => airport.iata_code === currentAnswer.iataCode
-    );
-    if (!correctAirport) return;
-    const isCorrect =
-      correctAirport.municipality.toLowerCase() ===
-      currentAnswer.municipality.toLowerCase();
+    if (!answerIsValid(currentAnswer)) return;
+    const isCorrect = answerIsCorrect(currentAnswer);
+
     dispatch(editCurrentAnswer({ ...currentAnswer, isCorrect }));
     dispatch(addAnswer({ iataCode: "", municipality: "", isCorrect: false }));
   };
