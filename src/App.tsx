@@ -2,18 +2,15 @@ import React, { useCallback } from "react";
 import "./App.css";
 import { Game } from "./game";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { addAnswer, editCurrentAnswer } from "./game/gameSlice";
+import { startGame, addAnswer, editCurrentAnswer } from "./game/gameSlice";
 import { data } from "./airports/cleanData";
+import { Leaderboard } from "./leaderboard";
 
 function App() {
   const playing = useAppSelector((state) => state.game.playing);
   const gameState = useAppSelector((state) => state.game);
   const currentAnswer = gameState.answers[gameState.answers.length - 1];
   const dispatch = useAppDispatch();
-
-  const startGame = () => {
-    dispatch(addAnswer({ iataCode: "", municipality: "", isCorrect: false }));
-  };
 
   const submitAnswer = () => {
     if (!currentAnswer) return;
@@ -34,16 +31,20 @@ function App() {
       if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
-        playing ? submitAnswer() : startGame();
+        playing ? submitAnswer() : dispatch(startGame());
       }
     },
     [playing, dispatch, currentAnswer]
   );
 
   return (
-    <div className="App" onKeyDown={handleEnterPressed}>
-      <header className="App-header">
+    <div id="eventRoot" className="App" onKeyDown={handleEnterPressed}>
+      <header
+        className="App-header"
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}
+      >
         <Game />
+        <Leaderboard />
       </header>
     </div>
   );

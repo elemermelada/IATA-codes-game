@@ -1,0 +1,45 @@
+/* Answer row layout styles */
+.answer-row {
+  margin: 10px auto;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-width: 350px;
+  gap: 10px;
+  border-radius: 4px;
+  background: #444;
+  transition: background 0.2s;
+}
+.answer-row.correct {
+  background: green;
+}
+.answer-row.incorrect {
+  background: red;
+}
+.answer-row.editable {
+  background: #444;
+}
+.answer-container {
+  height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #222;
+}
+/* Custom scrollbar for AnswerContainer */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #222;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #222;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}

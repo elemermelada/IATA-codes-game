@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { AnswerContainer } from "./answer";
-import { addAnswer, changePlayerName } from "./gameSlice";
+import { changePlayerName } from "./gameSlice";
 
 export const Game = () => {
   const gameState = useAppSelector((state) => state.game);
