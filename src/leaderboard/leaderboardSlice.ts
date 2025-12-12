@@ -1,39 +1,53 @@
 // Leaderboard reducer should keep track of the players and their scores
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../redux/store';
-import { GameState } from '../game/gameSlice';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../redux/store";
+import { GameState } from "../game/gameSlice";
+import { getLeaderBoard } from "./api";
 
-interface PlayerScore { 
-    playerName: string;
-    score: number;
+export interface PlayerScore {
+  playerName: string;
+  score: number;
 }
 
 interface LeaderboardState {
-    scores: PlayerScore[];
+  scores: PlayerScore[];
 }
 
 const initialState: LeaderboardState = {
-    scores: []
+  scores: [],
+};
+
+export const convertGameStateToPlayerScore = (
+  gameState: GameState
+): PlayerScore => {
+  const correctAnswers = gameState.answers.filter(
+    (answer) => answer.isCorrect
+  ).length;
+  return {
+    playerName: gameState.playerName,
+    score: correctAnswers,
+  };
 };
 
 export const leaderboardSlice = createSlice({
-    name: 'leaderboard',
-    initialState,
-    reducers: {
-        addGameResult: (state, action: PayloadAction<GameState>) => {
-            const correctAnswers = action.payload.answers.filter(answer => answer.isCorrect).length;
-            state.scores.push({
-                playerName: action.payload.playerName,
-                score: correctAnswers
-            });
-        },
-        resetLeaderboard: (state) => {
-            state.scores = [];
-        }
-    }
+  name: "leaderboard",
+  initialState,
+  reducers: {
+    // addGameResult: (state, action: PayloadAction<GameState>) => {
+    //   state.scores.push(convertGameStateToPlayerScore(action.payload));
+    //   const leaderboard = getLeaderBoard();
+    //   state
+    // },
+    updateLeaderboard: (state, action: PayloadAction<PlayerScore[]>) => {
+      state.scores = action.payload;
+    },
+    resetLeaderboard: (state) => {
+      state.scores = [];
+    },
+  },
 });
 
-export const { addGameResult, resetLeaderboard } = leaderboardSlice.actions;
+export const { resetLeaderboard, updateLeaderboard } = leaderboardSlice.actions;
 
 export const selectScores = (state: RootState) => state.leaderboard.scores;
 

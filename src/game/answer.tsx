@@ -4,7 +4,11 @@ import { data } from "../airports/cleanData";
 import Select from "react-select";
 import "./answer.css";
 import { useEffect, useState } from "react";
-import { addGameResult } from "../leaderboard/leaderboardSlice";
+import {
+  updateLeaderboard,
+  convertGameStateToPlayerScore,
+} from "../leaderboard/leaderboardSlice";
+import { getLeaderBoard, saveGameResult } from "../leaderboard/api";
 
 const municipalityList = Array.from(
   new Set(data.map((item) => item.municipality))
@@ -16,6 +20,50 @@ const municipalityOptions = municipalityList.map((m) => ({
   value: m,
   label: m,
 }));
+
+// TODO - move this
+const colourStyles = {
+  control: (styles: any) => ({
+    ...styles,
+    backgroundColor: "#fff",
+    color: "#222",
+    borderRadius: "6px",
+    borderColor: "#888",
+    fontSize: "1.2rem",
+    boxShadow: "none",
+    minHeight: "40px",
+  }),
+  menu: (styles: any) => ({
+    ...styles,
+    backgroundColor: "#f8f8f8",
+    color: "#222",
+    borderRadius: "6px",
+    borderColor: "#888",
+    fontSize: "1.2rem",
+    zIndex: 10,
+  }),
+  option: (
+    styles: any,
+    { isFocused, isSelected }: { isFocused: boolean; isSelected: boolean }
+  ) => ({
+    ...styles,
+    backgroundColor: isSelected ? "#007bff" : isFocused ? "#e0e0e0" : "#f8f8f8",
+    color: isSelected ? "#fff" : "#222",
+    fontSize: "1.2rem",
+    padding: "12px 16px",
+    cursor: "pointer",
+  }),
+  singleValue: (styles: any) => ({
+    ...styles,
+    color: "#222",
+    fontSize: "1.2rem",
+  }),
+  placeholder: (styles: any) => ({
+    ...styles,
+    color: "#888",
+    fontSize: "1.2rem",
+  }),
+};
 
 const Answer = ({
   answer,
@@ -63,10 +111,12 @@ const Answer = ({
           isDisabled={!editable}
           isSearchable
           placeholder="Select city..."
+          styles={colourStyles}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
+              // We let the select save the selected value first
               e.stopPropagation();
-              // Let react-select update value first
+              // Now we trigger the global enter handler
               setTimeout(() => {
                 const root = document.getElementById("eventRoot");
                 if (root) {
@@ -87,6 +137,13 @@ const Answer = ({
 
 const AnswerClock = ({ lastAnswerTime }: { lastAnswerTime: number }) => {
   const dispatch = useAppDispatch();
+  const saveAndEnd = async () => {
+    const playerScore = convertGameStateToPlayerScore(gameState);
+    await saveGameResult(playerScore);
+    const newLeaderboard = await getLeaderBoard();
+    dispatch(updateLeaderboard(newLeaderboard));
+    dispatch(endGame());
+  };
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const gameState = useAppSelector((state) => state.game);
 
@@ -97,15 +154,18 @@ const AnswerClock = ({ lastAnswerTime }: { lastAnswerTime: number }) => {
         const elapsedTime = Math.floor((now.getTime() - lastAnswerTime) / 1000);
         const timeLeft = 60 - elapsedTime;
         if (timeLeft <= 0) {
-          dispatch(addGameResult(gameState));
-          dispatch(endGame());
+          saveAndEnd();
         }
         setTimeLeft(timeLeft);
       }
     }, 100);
     return () => clearInterval(interval);
   }, [lastAnswerTime]);
-  return <span>{timeLeft} seconds left</span>;
+  return (
+    <span>
+      {timeLeft} seconds left <button onClick={saveAndEnd}>End Now</button>
+    </span>
+  );
 };
 
 export const AnswerContainer = () => {

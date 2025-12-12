@@ -1,8 +1,20 @@
-import { useAppSelector } from "../redux/hooks";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import "./index.css";
+import { getLeaderBoard } from "./api";
+import { updateLeaderboard } from "./leaderboardSlice";
 
 export const Leaderboard = () => {
   const scores = [...useAppSelector((state) => state.leaderboard.scores)];
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    // Could fetch updated leaderboard here if desired
+    getLeaderBoard().then((data) => {
+      // Update the leaderboard state with fetched data
+      // Assuming you have an action to update the leaderboard
+      dispatch(updateLeaderboard(data));
+    });
+  }, []);
   if (scores.length === 0) return <div>Results will show up here</div>;
   scores.sort((a, b) => b.score - a.score);
   return (
